@@ -11,7 +11,7 @@ export class StoryService {
   private apiUrl = 'http://127.0.0.1:3000';
 
   private _users: User[] = [
-    { id: '0', username: 'konto_testowe', email: 'testowe@example.com', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Test', bio: 'Konto testowe.', password: '123' },
+    { id: '0', username: 'konto_testowe', email: 'gosc@example.com', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Test', bio: 'Konto testowe.', password: '123' },
     { id: '1', username: 'ksiazkoholik99', email: 'user1@example.com', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix', bio: 'Mistrz fantasy.', password: '123' },
     { id: '2', username: 'NikaK', email: 'nikak@gmail.com', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=NikaK', bio: 'Kocham fantastykę, musicale, krewetki w tempurze, kolor różowy, Jonathana Groffa, programowanie, gimnastykę artystyczną, Jonathana Groffa, rysowanie, malowanie, taniec, akrobatykę, Jonathana Groffa, organizację Kalendarza... A, no i Jonathana Groffa', password: 'nikak' },
     { id: '3', username: 'Cien_Psychiki', email: 'horror1@test.pl', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shadow', bio: 'Piszę psychologiczne horrory i mroczne opowiadania.', password: '123' },
