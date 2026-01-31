@@ -1,0 +1,118 @@
+@if (story) {
+  <div class="row mb-5">
+    <div class="col-md-4">
+      <img [src]="story.coverUrl" class="img-fluid rounded shadow" alt="{{ story.title }}">
+    </div>
+    
+    <div class="col-md-8">
+      <h1 class="display-4">{{ story.title }}</h1>
+      
+   @if (author) {
+        <p class="lead text-muted">
+          Autor: <a [routerLink]="['/user', author.id]" class="text-decoration-none fw-bold author-link">{{ author.username }}</a>
+        </p>
+      }
+
+      <div class="mb-3">
+        @if (!isEditingTags) {
+          @for (tag of story.tags; track tag) {
+            <span class="badge bg-secondary me-1">#{{ tag }}</span>
+          }
+      @if (isAuthor()) {
+            <button (click)="toggleEditTags()" class="btn btn-sm text-decoration-none p-0 ms-2 edit-btn">
+              <i class="bi bi-pencil-square"></i> Edytuj tagi
+            </button>
+          }
+        } @else {
+          <div class="d-flex gap-2">
+            <input type="text" [(ngModel)]="editedTags" class="form-control form-control-sm w-50" placeholder="tag1, tag2...">
+            <button (click)="saveTags()" class="btn btn-success btn-sm">Zapisz</button>
+            <button (click)="toggleEditTags()" class="btn btn-outline-secondary btn-sm">Anuluj</button>
+          </div>
+        }
+      </div>
+
+      <div class="d-flex gap-3 mb-4 text-muted">
+        <span><i class="bi bi-eye"></i> {{ story.views }} wyświetleń</span>
+        <span [class.text-danger]="hasLiked" [class.fw-bold]="hasLiked" (click)="!isAuthor() && likeStory()" [style.cursor]="isAuthor() ? 'default' : 'pointer'">
+          <i class="bi" [class.bi-heart-fill]="hasLiked" [class.bi-heart]="!hasLiked"></i> {{ story.likes }} polubień
+        </span>
+        <span><i class="bi bi-calendar"></i> {{ story.createdAt | date }}</span>
+      </div>
+
+      <p class="lead">{{ story.description }}</p>
+
+      <div class="mt-3 d-flex gap-2">
+        <a *ngIf="chapters.length > 0" [routerLink]="['/story', story.id, 'chapter', chapters[0].id]" class="btn publish-btn btn-lg">
+          <i class="bi bi-book-half"></i> Czytaj
+        </a>
+        
+        @if (isAuthor()) {
+          <a [routerLink]="['/story', story.id, 'add-chapter']" class="btn read-btn-outline btn-lg">
+            <i class="bi bi-plus-lg"></i> Dodaj rozdział
+          </a>
+          <button (click)="deleteStory()" class="btn btn-outline-danger btn-lg">
+            <i class="bi bi-trash"></i> Usuń
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <hr class="my-5">
+
+  <div class="row">
+    <div class="col-md-8">
+      <h3>Spis treści</h3>
+      <div class="list-group list-group-flush mb-5">
+        @for (chapter of chapters; track chapter.id) {
+          <a [routerLink]="['/story', story.id, 'chapter', chapter.id]" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="mb-1">{{ chapter.title }}</h5>
+              <small class="text-muted">Opublikowano: {{ chapter.publishedAt | date:'shortDate' }}</small>
+            </div>
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        } @empty {
+          <p class="text-muted">Brak opublikowanych rozdziałów.</p>
+        }
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <h3>Komentarze</h3>
+      <div class="card bg-light border-0 mb-3">
+        <div class="card-body">
+          <div class="mb-3">
+            <textarea #commentBox class="form-control" rows="3" placeholder="Napisz, co myślisz..."></textarea>
+            <button (click)="sendComment(commentBox.value); commentBox.value=''" class="btn publish-btn btn-sm mt-2 w-100">
+              Dodaj komentarz
+            </button>
+          </div>
+
+          @for (comment of comments; track comment.id) {
+            <div class="mb-3 border-bottom pb-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <a [routerLink]="['/user', comment.userId]" class="text-decoration-none fw-bold small author-link">
+                  {{ comment.username }}
+                </a>
+                <small class="text-muted small">{{ comment.createdAt | date:'shortDate' }}</small>
+              </div>
+              <p class="mb-0 small">{{ comment.content }}</p>
+            </div>
+          } @empty {
+            <p class="text-muted text-center">Brak komentarzy.</p>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="text-center py-5">
+    <div class="spinner-border text-primary mb-3" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-muted">Ładowanie...</p>
+    <a routerLink="/" class="btn btn-outline-secondary mt-3">Wróć do strony głównej</a>
+  </div>
+}

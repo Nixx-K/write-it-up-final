@@ -1,0 +1,61 @@
+<div class="bg-white shadow-sm mb-4 p-3 rounded">
+  <div class="row g-3">
+    <div class="col-md-5">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+        <input type="text" [(ngModel)]="searchText" (input)="applyFilters()" class="form-control border-start-0" placeholder="Szukaj po tytule...">
+      </div>
+    </div>
+    <div class="col-md-3">
+      <select [(ngModel)]="selectedGenre" (change)="applyFilters()" class="form-select">
+        @for (genre of genres; track genre) {
+          <option [value]="genre">{{ genre }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-4">
+      <input type="text" [(ngModel)]="selectedTag" (input)="applyFilters()" class="form-control" placeholder="Szukaj po tagu...">
+    </div>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Eksploruj opowiadania</h2>
+  @if (authService.currentUser$ | async) {
+    <a routerLink="/add-story" class="btn publish-btn">
+      <i class="bi bi-plus-circle"></i> Opublikuj opowiadanie
+</a>
+  }
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+  @for (story of filteredStories; track story.id) {
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0">
+        <img [src]="story.coverUrl" class="card-img-top" alt="{{ story.title }}" style="height: 250px; object-fit: cover;">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <span class="badge bg-secondary">{{ story.genre }}</span>
+            <small class="text-muted"><i class="bi bi-eye"></i> {{ story.views }}</small>
+          </div>
+          <h5 class="card-title">{{ story.title }}</h5>
+          <p class="card-text text-secondary small">{{ story.description | slice:0:100 }}...</p>
+          <div class="mt-2">
+            @for (tag of story.tags; track tag) {
+              <span class="badge rounded-pill bg-light text-dark border me-1 small">#{{ tag }}</span>
+            }
+          </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 pb-3">
+          <a [routerLink]="['/story', story.id]" class="btn read-btn-outline w-100">
+            <i class="bi bi-book"></i> Czytaj
+          </a>
+        </div>
+      </div>
+    </div>
+  } @empty {
+    <div class="col-12 text-center py-5">
+      <p class="text-muted">Nie znaleziono opowiadań spełniających kryteria.</p>
+    </div>
+  }
+</div>

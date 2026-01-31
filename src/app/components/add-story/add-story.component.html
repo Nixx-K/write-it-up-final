@@ -1,0 +1,70 @@
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white p-4">
+          <h2 class="mb-0">Opublikuj nowe dzieło</h2>
+        </div>
+        <div class="card-body p-4">
+          <form (ngSubmit)="onSubmit()">
+            <div class="row">
+              <!-- Lewa kolumna: Metadane -->
+              <div class="col-md-5 border-end">
+                <h4 class="mb-3">Informacje ogólne</h4>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Tytuł opowiadania</label>
+                  <input type="text" [(ngModel)]="story.title" name="title" class="form-control form-control-lg" required>
+                </div>
+                
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Gatunek</label>
+                  <select [(ngModel)]="story.genre" name="genre" class="form-select">
+                    <option>Fantasy</option>
+                    <option>Romans</option>
+                    <option>Kryminał</option>
+                    <option>Horror</option>
+                    <option>Science-Fiction</option>
+                    <option>Inny</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Tagi (oddziel przecinkami)</label>
+                  <input type="text" [(ngModel)]="story.tagsString" name="tags" class="form-control" placeholder="magia, smoki, zemsta">
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Opis</label>
+                  <textarea [(ngModel)]="story.description" name="description" class="form-control" rows="4"></textarea>
+                </div>
+                
+                <div class="mb-3">
+                  <label class="form-label fw-bold">URL okładki</label>
+                  <input type="text" [(ngModel)]="story.coverUrl" name="coverUrl" class="form-control">
+                </div>
+              </div>
+
+              <!-- Prawa kolumna: Treść Rozdziału 1 -->
+              <div class="col-md-7 ps-md-4">
+                <h4 class="mb-3">Treść rozdziału 1</h4>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Tytuł rozdziału</label>
+                  <input type="text" [(ngModel)]="firstChapter.title" name="chapterTitle" class="form-control">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Tekst rozdziału</label>
+                  <textarea [(ngModel)]="firstChapter.content" name="chapterContent" class="form-control" rows="15" required placeholder="Dawno, dawno temu..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 mt-4 border-top pt-4">
+              <button type="button" (click)="cancel()" class="btn btn-outline-secondary px-4">Anuluj</button>
+              <button type="submit" class="btn px-5 btn-lg publish-btn">Opublikuj i zacznij pisać</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

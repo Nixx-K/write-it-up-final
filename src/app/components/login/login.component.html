@@ -1,0 +1,68 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white text-center py-4">
+          <h3 class="mb-0">{{ isLoginMode ? 'Logowanie' : 'Rejestracja' }}</h3>
+        </div>
+        <div class="card-body p-4">
+          
+          <div *ngIf="errorMessage" class="alert" [class.alert-danger]="!errorMessage.includes('utworzone')" [class.alert-success]="errorMessage.includes('utworzone')">
+            {{ errorMessage }}
+          </div>
+
+          <!-- Formularz Logowania -->
+          <form *ngIf="isLoginMode" (ngSubmit)="onLogin()">
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" [(ngModel)]="loginData.email" name="email" class="form-control" required placeholder="user&#64;example.com">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Hasło</label>
+              <input type="password" [(ngModel)]="loginData.password" name="password" class="form-control" required placeholder="********">
+            </div>
+            <button type="submit" class="btn publish-btn w-100 py-2 mb-3">Zaloguj się</button>
+            
+            <div class="hr-text text-muted mb-3 text-center small"><span>LUB SZYBKIE LOGOWANIE</span></div>
+            
+            <div class="d-grid gap-2 mb-3">
+              <button type="button" (click)="quickLogin('gosc&#64;example.com')" class="btn btn-outline-secondary btn-sm">Zaloguj jako Gość</button>
+              <button type="button" (click)="quickLogin('user1&#64;example.com')" class="btn btn-outline-secondary btn-sm">Zaloguj jako Autor (ksiazkoholik99)</button>
+            </div>
+
+            <div class="text-center">
+              <span class="text-muted">Nie masz konta? </span>
+              <a href="javascript:void(0)" (click)="toggleMode()" class="login-text fw-bold">Zarejestruj się</a>
+            </div>
+          </form>
+
+          <!-- Formularz Rejestracji -->
+          <form *ngIf="!isLoginMode" (ngSubmit)="onRegister()">
+            <div class="mb-3">
+              <label class="form-label">Nazwa użytkownika</label>
+              <input type="text" [(ngModel)]="registerData.username" name="username" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" [(ngModel)]="registerData.email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Hasło</label>
+              <input type="password" [(ngModel)]="registerData.password" name="password" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Powtórz hasło</label>
+              <input type="password" [(ngModel)]="registerData.confirmPassword" name="confirmPassword" class="form-control" required>
+            </div>
+            <button type="submit" class="btn publish-btn w-100 py-2 mb-3">Załóż konto</button>
+            <div class="text-center">
+              <span class="text-muted">Masz już konto? </span>
+              <a href="javascript:void(0)" (click)="toggleMode()" class="login-text fw-bold">Zaloguj się</a>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

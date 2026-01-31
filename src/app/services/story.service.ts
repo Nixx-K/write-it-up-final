@@ -1,0 +1,203 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Story, Chapter, Comment, User, Follow, Rating, UserLike } from '../models';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class StoryService {
+  private apiUrl = 'http://127.0.0.1:3000';
+
+  private _users: User[] = [
+    { id: '0', username: 'Gosc_Testowy', email: 'gosc@example.com', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest', bio: 'Konto testowe.', password: '123' },
+    { id: '1', username: 'ksiazkoholik99', email: 'user1@example.com', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix', bio: 'Mistrz fantasy.', password: '123' },
+    { id: '2', username: 'mroczna_dusza', email: 'user2@example.com', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka', bio: 'Piszę horrory.', password: '123' },
+    { id: '3', username: 'Piorunujacy_Pisarz', email: 'piorun@test.pl', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Thunder', bio: 'Uwielbiam science-fiction!', password: '123' },
+    { id: '4', username: 'Romantyczna_Anna', email: 'ania@love.pl', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Anna', bio: 'Opowiadania o miłości.', password: '123' },
+    { id: "5", username: "NikaK", email: "nikak@gmail.com", avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=NikaK", bio: "Kocham fantastykę, musicale, krewetki w tempurze, kolor różowy, Jonathana Groffa, programowanie, gimnastykę artystyczną, Jonathana Groffa, rysowanie, malowanie, taniec, akrobatykę, Jonathana Groffa, organizację Kalendarza... A, no i Jonathana Groffa", password: "nikak"
+    },
+  ];
+
+  private _stories: Story[] = [
+    { id: '1', authorId: '1', title: 'Cień Smoka', description: 'W świecie, gdzie smoki zostały zapomniane, jeden chłopiec odkrywa jajo, które może zmienić losy królestwa.', genre: 'Fantasy', tags: ['magia', 'smoki'], views: 150, likes: 23, coverUrl: 'https://placehold.co/300x450/333/FFF?text=Cien+Smoka', createdAt: new Date().toISOString() },
+    { id: '2', authorId: '2', title: 'Szepty w Mroku', description: 'Stary dom na wzgórzu skrywa tajemnicę, której nikt nie chce poznać.', genre: 'Horror', tags: ['duchy', 'tajemnica'], views: 89, likes: 12, coverUrl: 'https://placehold.co/300x450/000/FFF?text=Szepty', createdAt: new Date().toISOString() },
+    { id: '3', authorId: '3', title: 'Marsjańska Kolonia', description: 'Rok 2150. Pierwsza baza na Marsie traci kontakt z Ziemią. Survival w kosmosie.', genre: 'Science-Fiction', tags: ['mars', 'kosmos'], views: 210, likes: 45, coverUrl: 'https://placehold.co/300x450/004/FFF?text=Mars', createdAt: new Date().toISOString() },
+    { id: '4', authorId: '4', title: 'Listy pod Jemiołą', description: 'Niezwykłe spotkanie w małej kawiarni, które zmienia życie dwojga ludzi.', genre: 'Romans', tags: ['miłość', 'święta'], views: 320, likes: 67, coverUrl: 'https://placehold.co/300x450/500/FFF?text=Listy', createdAt: new Date().toISOString() },
+    { id: '5', authorId: '1', title: 'Miecz Przeznaczenia', description: 'Kontynuacja przygód w krainie fantasy. Czy bohaterowie odnajdą zaginiony artefakt?', genre: 'Fantasy', tags: ['magia', 'miecz'], views: 120, likes: 15, coverUrl: 'https://placehold.co/300x450/222/FFF?text=Miecz', createdAt: new Date().toISOString() },
+    { id: '6', authorId: '2', title: 'Zbrodnia na Klifie', description: 'Mroczny kryminał osadzony w mglistym miasteczku nad oceanem.', genre: 'Kryminał', tags: ['morderstwo', 'detektyw'], views: 450, likes: 89, coverUrl: 'https://placehold.co/300x450/111/FFF?text=Zbrodnia', createdAt: new Date().toISOString() },
+    { id: "7", authorId: "5", title: "Wędrówka: Początek", description: "Jak znacie i lubicie 'Kroniki Podziemi', to się Wam spodoba ❤️", genre: "Fantasy", tags: [
+        "magia",
+        "smoki",
+        "przepowiednia",
+        "found family"
+      ],
+      views: 600,
+      likes: 89,
+      coverUrl: "https://i.postimg.cc/j2rMGvsq/8d9d99377b36c1d6e4048611cebb36c3a34dfc42-(1).png",
+      createdAt: new Date().toISOString()
+    }
+  ];
+
+  private _chapters: Chapter[] = [
+    { id: '101', storyId: '1', title: 'Rozdział 1', content: 'Wiatr wył między skałami, gdy Elara postawiła pierwszy krok na ścieżce zapomnianych...', publishedAt: new Date().toISOString() },
+    {
+      id: "102",
+      storyId: "7",
+      title: "Prolog",
+      content: "Korytarz pogrążony był w ciemności i przytulnej, ciepłej nocnej ciszy. Strażnicy stali przynajmniej kilkanaście metrów dalej, w oświetlonym miękkim ogniem pochodni rozwidleniu tegoż korytarza. Wystarczająco daleko, by nie docierało do nich okazjonalne skrzypienie drewnianej podłogi. Okazjonalne, ponieważ, jak wcześniej wspomniano, w korytarzu panowała przecież cisza. Słodka, gęsta, otulająca mieszkańców pałacu niczym gruby, futrzasty, zimowy kocy-\nBAM!\nStrażnik (ten stojący na rogu rozwidlenia) zamarł. Jego ręka powędrowała do rękojeści miecza wiszącego przy pasie. Wychylił się zza rogu i zmrużył oczy. Korytarz nadal był równie cichy i  ciemny,  jedynie mleczne światło księżyca wpadało przez złoto-błękitny witraż, rozciągający się na całej wysokości przeciwległej do rozwidlenia (oraz strażnika, ma się rozumieć) ściany. Zero ruchu. Zero drżących dyskretnie cieni. Ta sama ciemność. I ta sama cisza.\n– Czysto? – zapytał stojący obok kolega z warty.\nStrażnik przypatrywał się korytarzowi jeszcze przez mniej więcej sekundę, jak to robi dokładny służbista, po czym wyprostował się, wracając na stanowisko.\n– Czysto.\nNa szczęście w ciemności niezbyt dobrze widać na odległość.\nSześcioletnia, i z racji tego niewysoka, dziewczynka stała wyprostowana z plecami przyklejonymi do ściany. Lewe ramię przycisnęła do siebie, podciągając bark pod brodę, aby zmieścić się w wyjątkowo niewielkiej przestrzeni ściany, niepokrytej przez irytująco gigantyczny witraż.\n– W porządku, nie boli cię? – dobiegł ją szept z lewej strony, z góry––należący do kogoś znacznie wyższego.\n– Jest wybitnie – odszepnęła.\nUpchnięta w drugi kąt korytarza, w znacznie śmieszniejszej pozycji, sylwetka mężczyzny z ciemnymi włosami chwilowo zastygła.\n– Skąd znasz takie słowa?\n– Ja znam dużo słów.\nJeszcze przez chwilę się nie poruszał, jakby próbował znaleźć odpowiednią ripostę. Po trzech sekundach poddał się i po cichu wypuścił powietrze z płuc.\n– Okej. Pamiętasz plan?\n– Wszystko wiem.\n– Trzy metry do przodu i skręcasz w prawo w tę małą wnęk…\n– Powiedziałam, że wiem! – syknęła z odrobinę zbyt wielkim zaangażowaniem przepony.\n– Ćśś! – usłyszała w odpowiedzi.\nNa końcu korytarza coś się poruszyło. Oboje zamarli.\nCień strażnika rzucany przez pochodnię zatańczył na odległej ścianie. Wstrzymali oddech.\nJedna sekunda.\nDwie.\nTrzy.\nCień przesunął się, ale tym razem nikt nie wychylił się zza rogu. Odetchnęli.\n– Czysto – wyszeptał mężczyzna. – Leć.\nNie trzeba było powtarzać. Dziewczynka odsunęła się od ściany i szybkim, choć ostrożnym krokiem przemierzyła planowane trzy metry, po czym skręciła w prawo. Chwilowo ogarnął ją wpadający przez witraż leniwy blask księżyca, rzucając światło na kędzierzawe gniazdo krótkich, białych włosów. Przez chwilę panowała cisza.\n– Teraz ty – wyszeptał podekscytowany głos.\nMężczyzna odczekał kilka sekund, bacznie obserwując rozwidlenie. Ogień pochodni wciąż tańczył na ścianie, ale już nic się nie poruszało. Zupełnie jakby sylwetka pilnująca korytarza zniknęła z miejsca posterunku.\nNie miał czasu się nad tym zastanawiać. Odepchnął się od ściany i szybkim susem po przekątnej przemierzył drogę do wnęki.\nDziewczynka już stała przy starych, masywnych i częściowo spróchniałych drzwiach. Fiołkowo-niebieskie oczy lśniły z ekscytacją, wpatrzone w mosiężną klamkę.\n– Co teraz? – wyszeptała, nie kryjąc uśmiechu.\n– Teraz… – zaczął, sięgając do kieszeni i wyciągając z niej dwa cienkie, tępe metalowe szpikulce. Jeden z nich podał sześciolatce. – Teraz przesuwamy.\n– No ale co?\n– Chodź tutaj i patrz.\nOdsunął się o krok, po czym przyklęknął. Dziewczynka wcisnęła się w przestrzeń pomiędzy nim a drzwiami. Przykleiła czoło do futryny, próbując dostrzec w architekturze drzwi cokolwiek, co mógł mieć na myśli. Nie dostrzegła.\n– Ciemno.\n– A teraz? – wychylił się i oparł dłoń o drzwi, pchając lekko. Drewno odsunęło się od futryny na nie więcej niż centymetr, ukazując niewielki fragment słabo oświetlonej przestrzeni po drugiej stronie.\n– Jest zasuwa – mruknęła dziewczynka. – Tutaj – wskazała palcem miejsce pomiędzy drzwiami a ramą kilka centymetrów pod swoją brodą, tam, gdzie coś grubego przesłaniało widok na pokój.\n– Trafna obserwacja, żołnierzu.\nRozpromieniła się.\n– To ją przesuwamy?\n– Dokładnie. Teraz tak – ty masz jeden drut, a ja drugi. Wciśniemy je w tę wnękę i przyciśniemy do zasuwy. Ja od góry, ty od dołu, więc…?\n– Pcham w górę.\n– Tak jest. Następnie najtrudniejsza część. Przesuwamy zasuwę. W prawo. Ale musimy naciskać z identyczną siłą i przesuwać w tym samym tempie. Zrozumiano?\n– Panie, tak, panie! – wykrzyknęła, po czym natychmiast zakryła usta dłonią. – Wybacz.\nMężczyzna spojrzał zrezygnowanym wzrokiem. Zamrugał. Westchnął.\n– Z zachowaniem należytej ciszy, poproszę – powiedział po kilku sekundach.\n– Okej – dźwięk był stłumiony przez niewielką dłoń ciągle przyklejoną do ust, może nie niewielkich, ale na pewno niedorównujących dłoni rozmiarem. – Panie, tak, panie – powtórzyła, ze znacznie niższym natężeniem decybeli.\n– Dobrze. Zaczynamy. Tylko pamiętaj, żeby nie naciskać za bardzo, bo szpikulec się wygnie.\nOdsunęła dłoń od ust. Druga ręka, ściskając drut, pofrunęła do szczeliny między futryną a drzwiami.\nPod kątem prostym przycisnęli szpikulce do zasuwy i zaczęli przesuwać. Trzy milimetry. Cztery. Potem sześć, i siedem, i–\nNadgarstek dziewczynki drgnął. Drut uderzył o róg drzwi ze stłumionym PUM, wyginając się.\n– O-o.\nMężczyzna cofnął rękę i delikatnie wysunął szpikulec z dłoni sześciolatki. Wstał, wycofał się o krok, po czym wyciągnął dłoń na ciemny korytarz. Zmrużył oczy. Na tle błękitnego witrażu narzędzie tworzyło czarny zarys. Według standardu włamywaczy kształt można było uznać za wystarczająco prosty.\n– Nic się nie stało. Nada się. Jeśli chcesz, możemy się wymienić.\nEnergicznie pokiwała głową. Roztrzepana grzywka przesłoniła oczy.\nPodał jej szpikulec, drugi już przystawiając do zasuwy.\n– Jeszcze raz. W prawo. I ostrożnie.\n– Ne ne ne ne – mruknęła pod nosem.\n– Jednorazowo to zignoruję.\nWystawiła język. Na ułamek sekundy, z oczami nadal skupionymi na spodzie zasuwy. Być może sądziła, że dzięki temu nie zauważy.\nZauważył.\nWolna dłoń błyskawicznie pofrunęła w dół. Palce ostrożnie zacisnęły się na jej żebrach.\nPisnęła i zwinęła się.\n– Łaskoczesz!\n– Reprymenda. Przyszła niesubordynacja karana będzie przerwaniem akcji.\n– Nie lubię cię.\n– Przeżyję. Wracaj do roboty, żołnierzu, bo zaraz nas nakryją.\nMomentalnie przylgnęła czołem do futryny. Język znowu wysunął się z ust, tym razem w geście skupienia. Małe rączki zacisnęły się na szpikulcu. Mięśnie ramion napięły się. Milimetr po milimetrze wbijała chropowatą powierzchnię metalu w grube drewno zasuwy, przesuwając w prawo.\nMężczyzna wykonywał ten sam ruch jedną dłonią, drugą napierając na powierzchnię drzwi. Na tyle, by odsunąć ich krawędź od krawędzi futryny, ale nie aż tak, żeby maksymalnie oparły się na zasuwie, uniemożliwiając manewrowanie.\nPrzesuwali kawałek po kawałku. Gdy końcówki metalu przywierały do krawędzi drzwi, podnosili je (lub opuszczali, w zależności od pozycji zajętej przy drzwiach), po czym przenosili maksymalnie w lewo. Znów ten sam taniec. Milimetr, dwa, cztery, osiem – granica. Odsunąć szpikulec, przycisnąć go z lewej i po kawałeczku przesuwać coraz bardziej w prawo.\nI jeszcze raz.\nI jeszcze jeden.\nA może… Nie, jednak jeszcze raz.\nAż w końcu:\nKRRRAK.\nDrzwi nagle ustąpiły pod naciskiem dużej dłoni i z wyjątkowo głośnym skrzypieniem – uchyliły się. Wzrok sześciolatki wystrzelił w górę. Spotkał się z delikatnym uśmiechem mężczyzny.\n– Czyń honory, żołnierzu.\nStłumiła pisk. Po czym popchnęła drzwi.\n–––\nKuchnia skąpana była w delikatnym, tańczącym pod wpływem wiatru świetle padającym z pochodni umieszczonych na zewnątrz pałacu. Ciepły blask wpadał z szeregu okien znajdujących się po prawej stronie i leniwie otulał kolejno: blaty pod oknami, wyspę na środku pomieszczenia oraz kawałek podłogi pod blatami i piecem po lewej stronie. Pod sufitem, przytulnie upchnięte, wisiały stare szafki skrywające przepisy, składniki oraz przyprawy. Naprzeciwko otwartych teraz drzwi znajdowało się główne wejście do kuchni – większe, mniej spróchniałe i znacznie lepiej zabezpieczone.\nA po prawej jego stronie, w cieniu pod jedną z szafek, nieśmiale skrywał się skarb. Cel całego przedsięwzięcia, nagroda za tydzień dobrych treningów, a także przykładnych manier poza treningami. Nieosiągalny. Niewłaściwy. Lecz za to jak kuszący, przepełniony, upragniony, pachnący…\nKosz z resztkami.\nDziewczynka zrobiła krok do przodu i zaczęła skakać po kamiennej posadzce. Mężczyzna podążył za nią.\n– Narobisz hałasu.\n– Nie-e.\n– Ach. Przepraszam. Skoro nie, to nie.\nNie odpowiedziała, ale podskoki zaczęły zmierzać w bardzo dokładnym kierunku, coraz bliżej upragnionego kosza.\n– Mogę już, mogę, mogę, mogę, mogę, prooooszęęęęęę?\nZrobił przyzwalający gest w kierunku nagrody. Pisnęła z radości. Popędziła w kierunku wysokiego krzesła upchniętego pomiędzy blatem a głównym wejściem i umiejętnie wspięła się na siedzenie. Obiema rękoma sięgnęła w kierunku kosza, po czym umieściła go sobie na kolanach. Zaczęła machać nogami.\n– Czekasz na coś? – spytał.\nPrzycisnęła kosz do siebie lewą ręką, a prawą wskazała na wyspę.\n– Tam.\n– Tam – powtórzył. – Faktycznie jest takie słowo.\nOdrzuciła głowę do tyłu i wydała z siebie nieokreślone EUGH. Po trzech sekundach głowa wróciła na miejsce.\n– Tam, proszę.\n– Ależ proszę bardzo – podszedł do krzesła, lekko ugiął kolana i uniósł drewnianą konstrukcję, rozpuszczone dziecko na niej siedzące, a także kosz z resztkami. Zrobił krok do przodu i postawił krzesło przy ciepło oświetlonej wyspie. Dziewczynka natychmiast umiejscowiła swoją nagrodę na grubej, drewnianej powierzchni.\n– W porządku – oznajmił. – Pamięta pani zasady?\nWyciągnęła dłoń przed siebie i zaczęła wyliczać.\n– Tylko dwie rzeczy. Jedna dla mnie, jedna dla Mel. OOO – oczy rozszerzyły się, jakby nagle odkryła coś na miarę nowej przepowiedni. Zaczęła podskakiwać na krześle. – A mogę wziąć dla Aurore?\n– Aurore tego nie zje.\n– Czemu.\n– Bo ja tego nie jem.\n– Aha – podskakiwanie zakończyło się. – Okej.\n– Kontynuuj.\nWskazała drugi palec na wyciągniętej dłoni.\n– Nie dotykać bez mycia rąk. Można brać ciastka, ale nie całe ciasta – trzeci palec.\n– I?\n– I nie zostawiać śladów – rozpromieniła się. – A jak mnie złapią, to powiedzieć, że to ty mówiłeś, żeby prosić o wybaczenie, a nie pozwolenie.\n– Tego możesz nie mówić.\n– Ale powiem.\nWestchnął.\n– Niech będzie. Solidna robota, żołnierzu. A solidną robotę nagradzamy. Możesz wziąć cztery rzeczy.\nGdyby była w stanie, jej szczęka leżałaby teraz na posadzce.\n– Ale! – przerwał, zanim zdążyła się pozbierać i po raz kolejny pisnąć z zachwytu. – Niewielkie. Powiedzmy, że dwie średnich rozmiarów i dwie mniejsze. Żebyście miały po równo. Nie zostawiamy śladów, tak?\nEnergicznie pokiwała głową. Mężczyzna uśmiechnął się lekko. Prawą dłonią sięgnął w kierunku chustki leżącej na koszyku. Na wewnętrzu przedramienia w świetle pochodni odznaczyła się długa, gruba poharatana linia jaśniejsza od reszty skóry. Pociągnął chustkę.\n– Ło! – oczy dziewczynki rozbłysły na widok przysmaków. Przynajmniej połowa drożdżowego ciasta z kolacji pokrojonego w sześcienne kawałki, cała drożdżówka ze śniadania okryta stwardniałą już skarmelizowaną masą, do której przykleiły się ciastowe okruszki, kromka kwaśnego chleba z ciemną, chropowatą pastą, którą usmarowała się już jedna z sześciu babeczek w ciężkiej, gęstej polewie powstałej z jakiegoś słodkiego warzywa, a także dwie serowe grzanki przytulały się do siebie, zgniecione pomiędzy ścianami koszyka.\nNatychmiast sięgnęła po dwa kawałki ciasta i ostrożnie odłożyła je na chustkę.\n– Cztery? – dopytała, bacznie wpatrując się w resztę obfitości oferowanych przez kosz.\n– Cztery.\nWyciągnęła jeszcze serową grzankę i po chwili namysłu dołożyła do niej największą z babeczek (na szczęście niesplamioną chropowatą pastą). Mężczyzna przekrzywił głowę.\n– Nie jedz tego na noc, nie będziesz mogła zasnąć.\n– Ale na jutro zostawię.\nWestchnął.\n– Bierz.\nRozpromieniła się i ze szczególnym skupieniem rozpoczęła pakowanie nowo zdobytych przysmaków w chustę.\n– Ciasto to są średnie rzeczy. A grzanka i babeczka małe. Bo babeczka będzie na jutro, więc się nie liczy, a grzanka jest słona, więc się też nie liczy.\n– Ja się z tobą nie będę kłócił, masz aprobatę – mruknął, odstawiając kosz z powrotem na oryginalne miejsce. – Tylko nie jedz na noc tego lukru.\n– Mówię przecież, że na rano – pokręciła głową i teatralnie zacmokała. – A ty mnie nie słuchasz wcale.\n– Słucham. Mam jednak podstawy, by nie wierzyć. Zapakowane?\nOtrzepała ręce i dumnie postawiła je na biodrach.\n– No. Ładnie?\n– Bardzo ładnie.\nZ szerokim uśmiechem zwiesiła nogi po boku krzesła, w jego kierunku, wyciągając ręce do przodu. Zamrugał.\n– Mam cię zanieść?\n– Na ziemię.\n– Sama się wdrapałaś.\n– Aha.\n– Więc?\n– Nie zejdę.\n– Na pewno zejdziesz.\n– Nie.\n– Potrafisz.\n– Nie potrafię.\n– Nie wygłupiaj się, wiem, że potra–\nOd strony nielegalnego wejścia nagle pojawiło się nowe źródło światła. Ich wzrok pofrunął w jego stronę.\nW drzwiach stał około trzydziestoletni mężczyzna, trzymający w uniesionej dłoni lampę naftową, rzucającą przyjemne, acz intensywne światło na połowę kuchni. Oraz, przy okazji, no bo przecież na pewno nie było to dokładnie wykalkulowane, na jego ciemnoniebieskie oczy, pomalowane rozmazanym kohlem na linii wodnej, roztrzepane blond loki, niewielki pieprzyk po lewej stronie szyi oraz wyjątkowo wydatne kości policzkowe. Na anielskiej twarzy znajdował się znacznie mniej anielski wyraz, dramatcznością pasujący do piramidy jedwabnej bieli, która (chyba) miała być piżamą.\nAnton.\n– Proszę, proszę, proszę – zadeklamował książę z bajki. Jego głos był dźwięczny i z łatwością wypełniał całą kuchnię, aktualnie określoną mianem miejsca zbrodni. – Generał i królewna. Łał. Et tu, gadzie? – spojrzał na ciemnowłosego mężczyznę z teatralnym zawodem. – Czuję się zdradzony i osamotniony. A do tego rozgoryczony. Nie, żeby was to obchodziło.\n– Naprawdę jesteś zły?\nAnton wolną ręką zagestykulował w kierunku dziewczynki.\n– Na tę piękną, idealną, małą białowłosą kruszynkę? W życiu.\n– Nie jestem mała – burknęła. Zignorował to.\n– Za to na ciebie? – wzrok powrócił w stronę generała. – Gniewam się potężnie i sam Gwydion tego nie zmieni.\n– Dlaczego?\n– Ach, no nie wiem, pomyślmy. Je się o normalnej porze, Anton. Nie rób tego, Sara się wkurzy, Anton. Znowu najesz się cukru i nie będziesz spać, Anton – przycisnął prawą dłoń do serca. – Wykluczacie mnie ze wspólnego rabowania kuchni. To boli. No cóż – westchnął. – Teraz macie za swoje. Nie obraźcie się, ale gdybym był z wami, strażnicy by nas nie usłyszeli i nikt nie otrzymywałby reprymendy. Ale ewidentnie nie można liczyć na lojalność w tym pałacu.\nGenerał spojrzał na dziewczynkę kątem oka.\n– Nie usłyszeliby niczego, gdyby ktoś nie zdecydował się potknąć na płaskiej powierzchni.\nUderzyła go piąstką w ramię.\n– To nie moja wina!\n– Właśnie, nie wiń dziecka. I tak by was usłyszeli. Jesteście równie subtelni, co ja.\n– Czyli…\n– Czyli wcale.\n– Nie żartuj, ty nie jesteś subtelny? – mężczyzna otworzył szeroko oczy. Anton zlustrował go wzrokiem, który, gdyby brzmiał, brzmiałby mniej więcej tak: „ty nie bądź nagle taki mądry”.\n– Nie rozkojarzaj mnie rozmowami o mojej osobie. Ta rozmowa jest o waszej dwójce i o tym, że tym włamaniem złamaliście moje biedne serce.\nOkej. Rozmowa między dorosłymi i to nie kręcąca się wcale wokół ciastek, a samego faktu podjęcia działania bez udziału Antona. A więc Anton nie ukara nikogo za podkradanie z kosza z resztkami. Jedyny problem w tym, że nie jest jedynym dorosłym w pałacu, a im dłużej trwa kuchenna kłótnia, tym większa szansa na to, że strażnicy zawołają innego dorosłego, który znacznie mniej przychylnie spojrzy na całą sytuację i, broń Gwydionie, za karę odbierze jej dwa kawałki ciasta, babeczkę oraz grzankę.\nTrzeba działać.\n– Byłam głodna – wtrąciła się. Zamrugała dużymi oczami i zwiesiła główkę. Nawet lekko zadrżała jej dolna warga. Reakcja była natychmiastowa.\n– Och, nikt tu nie jest na ciebie zły, płomyczku ty mój – Anton zostawił lampę na najbliższym blacie, podbiegł do dziewczynki i pocałował ją w czoło. – Przepraszam. Besztam twojego wujka.\nMężczyzna uniósł brwi.\n– Wujka?\n– Tak. Nie marudź.\n– Ja nigdy nie marudzę.\nAnton uśmiechnął się szeroko.\n– Dobrze więc. Bierz ten pakunek i spać, królewno, bo rodzice się na nas wkurzą, a tego byśmy nie chcieli, czyż nie? – na tych słowach zupełnie niesubtelnie wbił wzrok w generała.\n– Absolutnie nie.\n– No i wspaniale! – rozpromienił się, podnosząc królewnę i stawiając ją na podłodze obok krzesła. Dziewczynka płynnym ruchem zgarnęła chustkę z ciastkami.\n– Dobranooooc – zanuciła najsłodszym głosikiem, jaki potrafiła z siebie wydobyć, po czym chwyciła rękę ciemnowłosego mężczyzny i zaczęła ciągnąć go w kierunku wyjścia.\n– Śpij dobrze – rzucił w kierunku Antona na odchodnym.\nZłotowłosy książę posłał mu buziaka. Gdy zniknęli za rogiem, uśmiechnął się pod nosem. Strzepnął z wyspy okruszki. Znalazł w szafce nową chustkę, którą przykrył ograbiony kosz. Po czym ruszył w stronę drzwi, chwycił lampę naftową i również podążył korytarzem.\n–––",
+      publishedAt:  new Date().toISOString()
+    }
+  ];
+
+  private _comments: Comment[] = [
+    { id: '201', storyId: '1', userId: '2', content: 'Świetny początek!', createdAt: new Date().toISOString() },
+    { id: '202', storyId: '7', userId: '3', content: 'Jezuu Anton to mega diva plz nie zabijaj go w następnym rozdziale', createdAt: new Date().toISOString() }
+  ];
+  private _follows: Follow[] = [];
+  private _ratings: Rating[] = [];
+  private _userLikes: UserLike[] = [];
+
+  constructor(private http: HttpClient) { }
+
+  getStories(): Observable<Story[]> {
+    return of([...this._stories]);
+  }
+
+  getStory(id: string): Observable<Story> {
+    const story = this._stories.find(s => s.id === id);
+    return story ? of(story) : of(this._stories[0]);
+  }
+
+  addStory(story: Partial<Story>): Observable<Story> {
+    const newStory = { ...story, id: Math.random().toString(36).substr(2, 9) } as Story;
+    this._stories.push(newStory);
+    return of(newStory);
+  }
+
+  deleteStory(id: string): Observable<any> {
+    this._stories = this._stories.filter(s => s.id !== id);
+    return of(true);
+  }
+
+  updateStoryTags(id: string, tags: string[]): Observable<any> {
+    const story = this._stories.find(s => s.id === id);
+    if (story) {
+      story.tags = tags;
+    }
+    return of(true);
+  }
+
+  incrementViews(storyId: string, currentViews: number): Observable<any> {
+    const story = this._stories.find(s => s.id === storyId);
+    if (story) story.views++;
+    return of(true);
+  }
+
+  getChapters(storyId: string): Observable<Chapter[]> {
+    return of(this._chapters.filter(c => c.storyId === storyId));
+  }
+
+  getChapter(id: string): Observable<Chapter> {
+    const chapter = this._chapters.find(c => c.id === id);
+    return chapter ? of(chapter) : of(this._chapters[0]);
+  }
+
+  addChapter(chapter: Partial<Chapter>): Observable<Chapter> {
+    const newChapter = { ...chapter, id: Math.random().toString(36).substr(2, 9) } as Chapter;
+    this._chapters.push(newChapter);
+    return of(newChapter);
+  }
+
+  updateChapter(id: string, content: string): Observable<any> {
+    const chapter = this._chapters.find(c => c.id === id);
+    if (chapter) {
+      chapter.content = content;
+    }
+    return of(true);
+  }
+
+  getComments(storyId: string): Observable<Comment[]> {
+    const comments = this._comments.filter(c => c.storyId === storyId).map(c => {
+      const user = this._users.find(u => u.id === c.userId);
+      return { ...c, username: user ? user.username : 'Nieznajomy' };
+    });
+    return of(comments);
+  }
+
+  addComment(comment: Partial<Comment>): Observable<Comment> {
+    const newComment = { ...comment, id: Math.random().toString(36).substr(2, 9) } as Comment;
+    this._comments.push(newComment);
+    return of(newComment);
+  }
+
+  getUserLike(userId: string, storyId: string): Observable<UserLike[]> {
+    return of(this._userLikes.filter(l => l.userId === userId && l.storyId === storyId));
+  }
+
+  toggleLike(userId: string, storyId: string): Observable<boolean> {
+    const index = this._userLikes.findIndex(l => l.userId === userId && l.storyId === storyId);
+    const story = this._stories.find(s => s.id === storyId);
+    
+    if (!story) return of(false);
+
+    if (index > -1) {
+      this._userLikes.splice(index, 1);
+      story.likes--;
+      return of(false);
+    } else {
+      this._userLikes.push({ id: Math.random().toString(), userId, storyId });
+      story.likes++;
+      return of(true);
+    }
+  }
+
+  getUsers(): Observable<User[]> {
+    return of([...this._users]);
+  }
+
+  getUser(userId: string): Observable<User> {
+    const user = this._users.find(u => u.id === userId);
+    return user ? of(user) : of(this._users[0]);
+  }
+
+  registerUser(user: Partial<User>): Observable<User> {
+    const newUser = { 
+      ...user, 
+      id: Math.random().toString(36).substr(2, 9),
+      avatarUrl: user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`,
+      bio: user.bio || ''
+    } as User;
+    this._users.push(newUser);
+    return of(newUser);
+  }
+
+  getFollowers(userId: string): Observable<Follow[]> {
+    return of(this._follows.filter(f => f.followingId === userId));
+  }
+
+  getFollowing(userId: string): Observable<Follow[]> {
+    return of(this._follows.filter(f => f.followerId === userId));
+  }
+
+  followUser(followerId: string, followingId: string): Observable<any> {
+    const newFollow = { id: Math.random().toString(), followerId, followingId };
+    this._follows.push(newFollow);
+    return of(newFollow);
+  }
+
+  unfollowUser(followId: string): Observable<any> {
+    this._follows = this._follows.filter(f => f.id !== followId);
+    return of(true);
+  }
+
+  getUserRatings(userId: string): Observable<Rating[]> {
+    return of(this._ratings.filter(r => r.ratedUserId === userId));
+  }
+
+  rateUser(raterId: string, ratedUserId: string, score: number): Observable<any> {
+    this._ratings.push({ id: Math.random().toString(), raterId, ratedUserId, score });
+    return of(true);
+  }
+}
