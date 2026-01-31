@@ -1,69 +1,105 @@
-/* You can add global styles to this file, and also import other style files */
+/* Bootstrap imports */
 @import "bootstrap/scss/bootstrap";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
+
+:root {
+  --bg-light: #f8f9fa;
+  --text-light: #1a1a2e;
+  --card-light: #ffffff;
+
+  --bg-dark: #38363C;
+  --text-dark: #eaeaf0;
+  --card-dark: #4C2260;
+
+  --primary: #8b44bb;
+  --primary-hover: #5a1cb8;
+}
+
+
 body {
-    font-family: "Poppins", sans-serif;
-    background-color: #f8f9fa; /* Jasne tło */
-    color: #1a1a2e
+  font-family: "Poppins", sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.light {
+  background-color: var(--bg-light);
+  color: var(--text-light);
+}
+
+
+body.dark {
+  background-color: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+body.dark .form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(139, 68, 187, 0.25);
+}
+
+
+.navbar {
+  transition: background-color 0.3s ease;
+}
+
+body.dark .navbar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.light .navbar {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 
 .my-card {
-    border-radius: 12px;
-    padding: 20px;
+  border-radius: 12px;
+  padding: 20px;
+  background-color: var(--card-light);
+  transition: background-color 0.3s ease;
 }
 
-.publish-btn {
-    background-color: #8b44bb;
-    color: #ffffff;
+body.dark .my-card {
+  background-color: var(--card-dark);
+}
 
-    &:hover {
-        background-color: #5a1cb8;
-        color: #f5eff6;
-    }
+
+.publish-btn {
+  background-color: var(--primary);
+  color: #ffffff;
+
+  &:hover {
+    background-color: var(--primary-hover);
+    color: #f5eff6;
+  }
 }
 
 .read-btn-outline {
-    background-color: transparent;
-    color: #8b44bb;
-    border: 1px solid #8b44bb;
+  background-color: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
 
-    &:hover {
-        background-color: #5a1cb8;
-        color: #ffffff;
-    }
+  &:hover {
+    background-color: var(--primary-hover);
+    color: #ffffff;
+  }
 }
 
-.author-link {
-    color: #864eb1;
+.author-link,
+.login-text,
+.breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
 
-    &:hover {
-        color: #5a1cb8;
-    }
-}
-
-.login-text {
-    color: #8b44bb;
-    text-decoration: none;
-
-    &:hover {
-        color: #5a1cb8;
-    }
+  &:hover {
+    color: var(--primary-hover);
+  }
 }
 
 .edit-btn {
-    color: #6728d7;
+  color: #6728d7;
 
-    &:hover {
-        color: #5a1cb8;
-    }
-}
-
-.breadcrumb a {
-    color: #8b44bb;
-
-    &:hover {
-        color: #6728d7;
-    }
+  &:hover {
+    color: var(--primary-hover);
+  }
 }
