@@ -59,9 +59,21 @@
               </div></div>
 
             <div class="mb-3">
-              <label class="form-label">Hasło</label>
-              <input type="password" [(ngModel)]="registerData.password" name="password" class="form-control" required>
-            </div>
+                <label class="form-label">Hasło</label>
+                <input
+                  type="password"
+                  [(ngModel)]="registerData.password"
+                  name="password"
+                  class="form-control"
+                  required
+                  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
+                  #password="ngModel">
+
+                <div *ngIf="password.invalid && password.touched" class="text-danger small">
+                  Hasło musi mieć min. 8 znaków, dużą literę i cyfrę
+                </div>
+              </div>
+
             <div class="mb-3">
               <label class="form-label">Powtórz hasło</label>
               <input type="password" [(ngModel)]="registerData.confirmPassword" name="confirmPassword" class="form-control" required>
