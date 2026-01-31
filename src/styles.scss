@@ -1,4 +1,4 @@
-/* Bootstrap imports */
+
 @import "bootstrap/scss/bootstrap";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -12,8 +12,11 @@
   --text-dark: #eaeaf0;
   --card-dark: #4C2260;
 
-  --primary: #8b44bb;
-  --primary-hover: #5a1cb8;
+  --primary: #8b53ac;
+  --primary-hover: #a62ed1;
+  --search-bar-dark: #2a1540;
+  --search-bar-dark-border: rgba(139, 68, 187, 0.35);
+  --description-dark: #c9a8e0;
 }
 
 
@@ -62,6 +65,107 @@ body.light .navbar {
 body.dark .my-card {
   background-color: var(--card-dark);
 }
+
+
+
+
+.search-filter-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+body.dark .search-filter-bar .form-control,
+body.dark .search-filter-bar .form-select {
+  background-color: var(--search-bar-dark);
+  color: var(--text-dark);
+  border: 1px solid var(--search-bar-dark-border);
+  border-radius: 8px;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &::placeholder {
+    color: rgba(200, 170, 224, 0.55);
+  }
+
+  &:focus {
+    background-color: #321a4a;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(139, 68, 187, 0.3);
+    color: var(--text-dark);
+  }
+}
+
+
+body.dark .search-filter-bar .form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b44bb' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+
+  option {
+    background-color: var(--search-bar-dark);
+    color: var(--text-dark);
+  }
+}
+
+
+
+
+.story-description {
+  transition: color 0.3s ease;
+}
+
+body.dark .story-description {
+  color: var(--description-dark);
+}
+
+
+
+body.dark .text-muted {
+  color: #a89bb5 !important;
+}
+
+
+body.dark .card.bg-light {
+  background-color: #2e2c32 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-dark);
+}
+
+
+body.dark .list-group-item {
+  background-color: #2e2c32;
+  color: var(--text-dark);
+  border-color: rgba(255, 255, 255, 0.08);
+
+  &:hover {
+    background-color: #3d3a42;
+    color: var(--text-dark);
+  }
+}
+
+
+body.dark .card.bg-light .form-control {
+  background-color: #35333a;
+  color: var(--text-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  &::placeholder {
+    color: #7a7388;
+  }
+
+  &:focus {
+    background-color: #3a3742;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(139, 68, 187, 0.25);
+  }
+}
+
+
+body.dark hr {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+
 
 
 .publish-btn {

@@ -36,7 +36,7 @@
             </div>
           </form>
 
-          <!-- Formularz Rejestracji -->
+          <!-- formularz rejestracji -->
           <form *ngIf="!isLoginMode" (ngSubmit)="onRegister()">
             <div class="mb-3">
               <label class="form-label">Nazwa użytkownika</label>
@@ -44,8 +44,20 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Email</label>
-              <input type="email" [(ngModel)]="registerData.email" name="email" class="form-control" required>
-            </div>
+              <input 
+                 type="email"
+                 [(ngModel)]="registerData.email"
+                 name="email"
+                 class="form-control"
+                 required
+                 pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                 placeholder="user@example.com"
+                 #email="ngModel">
+                
+              <div *ngIf="email.invalid && email.touched" class="text-danger small">
+                Wprowadź poprawny adres email
+              </div></div>
+
             <div class="mb-3">
               <label class="form-label">Hasło</label>
               <input type="password" [(ngModel)]="registerData.password" name="password" class="form-control" required>
